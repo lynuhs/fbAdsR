@@ -10,8 +10,9 @@
 #' @examples
 #' fetch_fb_data(object=c("me","accounts","campaigns",fb_userId()), scope=c("adaccounts","insights"), parameters="", api_version="3.2")
 fetch_fb_data <- function(object, scope = "", parameters = "", api_version = "3.2"){
-  fb_check_existing_token()
-
+  if(!fb_check_existing_token()){
+    stop("No authenticated token found!")
+  }
   data <- GET(url = paste0(
     paste0("https://graph.facebook.com/v",api_version,"/"),
     object,"/",
