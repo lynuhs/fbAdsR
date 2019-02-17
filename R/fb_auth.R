@@ -20,6 +20,9 @@ FacebookAuth <- R6::R6Class(
 fb_auth <- function(key = Sys.getenv("FB_CLIENT_ID"), secret = Sys.getenv("FB_CLIENT_SECRET"), token = NULL, new_user = FALSE){
   if(key == "" | secret == ""){
     stop("Need a valid Client ID and Client Secret in order to authorize connection!", call. = FALSE)
+  } else {
+    options(FB_CLIENT_ID = key)
+    options(FB_CLIENT_SECRET = secret)
   }
 
   checkEnvFile <- function(env){
