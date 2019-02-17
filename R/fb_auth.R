@@ -93,6 +93,7 @@ fb_auth <- function(key = Sys.getenv("FB_CLIENT_ID"), secret = Sys.getenv("FB_CL
   fb_check_existing_token()
 
   ## return facebook_token above
+  cat(crayon::green("Successfully authenticated Facebook API!\n"))
   return(invisible(facebook_token))
 
 }
