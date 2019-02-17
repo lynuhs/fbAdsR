@@ -3,6 +3,8 @@
 export(FacebookAuth)
 export(fb_auth)
 export(fb_check_existing_token)
+export(fb_userId)
+export(fetch_fb_data)
 import(assertthat)
 importFrom(httr,config)
 importFrom(httr,oauth2.0_token)
