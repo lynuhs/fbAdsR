@@ -22,23 +22,33 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, level="c
   metrics <- paste(metrics, collapse=",")
 
   fields <- paste(c(dimensions,metrics), collapse = ",")
-  request <- paste0(
-    account_id,
-    "/insights?",
-    "time_range={'since':'",as.character(fromDate),"','until':'",as.character(toDate),"'}",
-    time,
-    "&fields=", fields,
-    "&level=", level,
-    "&limit=99999"
-  )
+
 
   if(length(account_id) > 1){
+    request <- paste0(
+      account_id[i],
+      "/insights?",
+      "time_range={'since':'",as.character(fromDate),"','until':'",as.character(toDate),"'}",
+      time,
+      "&fields=", fields,
+      "&level=", level,
+      "&limit=99999"
+    )
     df <- NULL
     dimensions[!(dimensions %in% "account_id")]
     for(i in 1:length(account_id)){
       df <- rbind(df, cbind(account_id=gsub("act_","",account_id[i]), fetch_fb_data(request)))
     }
   } else {
+    request <- paste0(
+      account_id,
+      "/insights?",
+      "time_range={'since':'",as.character(fromDate),"','until':'",as.character(toDate),"'}",
+      time,
+      "&fields=", fields,
+      "&level=", level,
+      "&limit=99999"
+    )
     df <- fetch_fb_data(request)
   }
 
