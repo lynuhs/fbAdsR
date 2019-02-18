@@ -9,9 +9,9 @@ fb_campaigns <- function(account_id = fb_adAccounts()){
   ids <- NULL
 
   for(i in 1:(length(account_id))){
-    data <- fetch_fb_data(account_id[i], "campaigns")
+    data <- fetch_fb_data(paste0(account_id[i], "/campaigns"))
     ids <- rbind(ids, data.frame(account_id  = account_id[i],
-                                 campaign_id = as.character(unlist(data[[1]]))))
+                                 campaign_id = data$id))
   }
   return(ids)
 }

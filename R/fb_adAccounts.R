@@ -4,9 +4,8 @@
 #' @examples
 #' fb_adAccounts()
 fb_adAccounts <- function(){
-  data <- fetch_fb_data(object = fb_userId(), scope = "adaccounts")
-  data <- unlist(data)
-  accounts <- as.character(data[names(data) == "data.id"])
+  request <- paste0(fb_userId(),"/adaccounts")
+  data <- fetch_fb_data(request)
 
-  return(accounts)
+  return(data$id)
 }
