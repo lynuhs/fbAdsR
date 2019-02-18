@@ -1,25 +1,47 @@
 #' Collect data from Facebook API
 #'
 #' This function will import the data for the chosen parameters.
-#' @param object The object to select data from.
-#' @param scope The scope to select data from.
-#' @param parameters The parameters to download. Breakdowns, dimensions and metrics.
+#' @param request_string A string that contains the API call to GET from Facebook.
 #' @param api_version The version of Facebook API.
 #' @export
 #' @examples
-#' fetch_fb_data(object=c("me","accounts","campaigns",fb_userId()), scope=c("adaccounts","insights"), parameters="", api_version="3.2")
+#' fetch_fb_data(request_string, api_version="3.2")
 #' @import httr
-fetch_fb_data <- function(object, scope = "", parameters = "", api_version = "3.2"){
+fetch_fb_data <- function(request_string, api_version = "3.2"){
   if(!fb_check_existing_token()){
-    stop("No authenticated token found!")
+    stop("No authenticated token found!",call. = FALSE)
   }
-  data <- httr::GET(url = paste0(
-    paste0("https://graph.facebook.com/v",api_version,"/"),
-    object,"/",
-    scope,
-    parameters
-  ),
-  config(token = FacebookAuth$public_fields$token))
+  data <- httr::GET(url = paste0("https://graph.facebook.com/v",api_version,"/", request_string),
+                    config(token = FacebookAuth$public_fields$token))
+
+  if(data$status_code != 200){
+    stop("Failed to make request to Facebook! Make sure to check your parameters, choose a shorter time range or use less granularity!")
+  }
   data <- rjson::fromJSON(rawToChar(data$content))
-  return(data)
+
+  if(!(is.null(data$data))){
+    data <- unlist(data$data)
+  }
+
+  cols <- length(unique(names(data)))
+  df <- data.frame(matrix(as.character(data), ncol=cols,byrow = TRUE))
+  colnames(df) <- unique(names(data))
+  for(i in 1:(ncol(df))){
+    if(grepl("date", colnames(df)[i])){
+      df[,i] <- as.Date(df[,i])
+    } else if (grepl("id$", colnames(df[i]))){
+      df[,i] <- as.character(df[,i])
+    } else{
+      df[,i] <- type.convert(df[,i])
+    }
+  }
+
+  if(all(c("date_start","date_stop") %in% colnames(df))){
+    if(all(df$date_start == df$date_stop)){
+      df <- df[,!(colnames(df) %in% "date_stop")]
+      colnames(df) <- gsub("date_start","date",colnames(df))
+    }
+  }
+
+  return(df)
 }

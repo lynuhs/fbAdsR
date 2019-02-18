@@ -4,15 +4,10 @@
 \alias{fetch_fb_data}
 \title{Collect data from Facebook API}
 \usage{
-fetch_fb_data(object, scope = "", parameters = "",
-  api_version = "3.2")
+fetch_fb_data(request_string, api_version = "3.2")
 }
 \arguments{
-\item{object}{The object to select data from.}
-
-\item{scope}{The scope to select data from.}
-
-\item{parameters}{The parameters to download. Breakdowns, dimensions and metrics.}
+\item{request_string}{A string that contains the API call to GET from Facebook.}
 
 \item{api_version}{The version of Facebook API.}
 }
@@ -20,5 +15,5 @@ fetch_fb_data(object, scope = "", parameters = "",
 This function will import the data for the chosen parameters.
 }
 \examples{
-fetch_fb_data(object=c("me","accounts","campaigns",fb_userId()), scope=c("adaccounts","insights"), parameters="", api_version="3.2")
+fetch_fb_data(request_string, api_version="3.2")
 }
