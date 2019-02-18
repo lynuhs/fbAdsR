@@ -5,7 +5,7 @@
 \title{Import statistics from Facebook}
 \usage{
 fb_stats(account_id, fromDate, toDate, dimensions, metrics,
-  level = "campaign")
+  breakdowns = "", level = "campaign")
 }
 \arguments{
 \item{account_id}{The account id for which you want to import data fram (needs to start with "act_").}
@@ -18,11 +18,13 @@ fb_stats(account_id, fromDate, toDate, dimensions, metrics,
 
 \item{metrics}{The metrics to use in the API request.}
 
-\item{level}{The level in which you want the data returned (defaults to "campaign")}
+\item{breakdowns}{What breakdowns should be used, e.g. age, gender etc.}
+
+\item{level}{The level in which you want the data returned c("account","campaign","adset","ad")}
 }
 \description{
 This function will import the statistics for the chosen parameters.
 }
 \examples{
-fb_stats(account_id, fromDate, toDate, dimensions, metrics, level=c("account","campaign","adset","ad"))
+fb_stats(account_id, fromDate, toDate, dimensions, metrics, breakdowns = "", level="campaign")
 }

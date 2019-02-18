@@ -6,11 +6,12 @@
 #' @param toDate The ending date for the time range you want.
 #' @param dimensions The dimensions to use in the API request.
 #' @param metrics The metrics to use in the API request.
-#' @param level The level in which you want the data returned (defaults to "campaign")
+#' @param breakdowns What breakdowns should be used, e.g. age, gender etc.
+#' @param level The level in which you want the data returned c("account","campaign","adset","ad")
 #' @export
 #' @examples
-#' fb_stats(account_id, fromDate, toDate, dimensions, metrics, level=c("account","campaign","adset","ad"))
-fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, level="campaign"){
+#' fb_stats(account_id, fromDate, toDate, dimensions, metrics, breakdowns = "", level="campaign")
+fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdowns = "", level="campaign"){
   if ("date" %in% dimensions){
     dimensions <- dimensions[which(dimensions!="date")]
     time <- "&time_increment=1"
@@ -33,6 +34,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, level="c
         "/insights?",
         "time_range={'since':'",as.character(fromDate),"','until':'",as.character(toDate),"'}",
         time,
+        "&breakdowns=", breakdowns,
         "&fields=", fields,
         "&level=", level,
         "&limit=99999"
@@ -45,6 +47,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, level="c
       "/insights?",
       "time_range={'since':'",as.character(fromDate),"','until':'",as.character(toDate),"'}",
       time,
+      "&breakdowns=", breakdowns,
       "&fields=", fields,
       "&level=", level,
       "&limit=99999"
