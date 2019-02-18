@@ -32,8 +32,16 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, level="c
     "&limit=99999"
   )
 
+  if(length(account_id) > 1){
+    df <- NULL
+    dimensions[!(dimensions %in% "account_id")]
+    for(i in 1:length(account_id)){
+      df <- rbind(df, cbind(account_id=gsub("act_","",account_id[i]), fetch_fb_data(request)))
+    }
+  } else {
+    df <- fetch_fb_data(request)
+  }
 
-  df <- fetch(request_string = request)
 
   return(df)
 }
