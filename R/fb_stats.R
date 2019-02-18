@@ -19,6 +19,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdow
     time <- ""
   }
 
+  breakdowns <- paste(breakdowns, collapse=",")
   dimensions <- paste(dimensions, collapse=",")
   metrics <- paste(metrics, collapse=",")
 
