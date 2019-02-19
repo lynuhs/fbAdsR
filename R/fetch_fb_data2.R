@@ -5,9 +5,9 @@
 #' @param api_version The version of Facebook API.
 #' @export
 #' @examples
-#' fetch_fb_data(request_string, api_version="3.2")
+#' fetch_fb_data2(request_string, api_version="3.2")
 #' @import httr
-fetch_fb_data <- function(request_string, api_version = "3.2"){
+fetch_fb_data2 <- function(request_string, api_version = "3.2"){
   if(!fb_check_existing_token()){
     stop("No authenticated token found!",call. = FALSE)
   }
@@ -22,9 +22,29 @@ fetch_fb_data <- function(request_string, api_version = "3.2"){
   if(!(is.null(data$data))){
     data <- unlist(data$data)
 
-    cols <- length(unique(names(data)))
-    df <- data.frame(matrix(as.character(data), ncol=cols,byrow = TRUE))
-    colnames(df) <- unique(names(data))
+    df <- NULL
+    for(l in 1:(length(fb))){
+      temp_df <- data.frame(temp = matrix(1))
+      for(i in 1:(length(fb[[l]]))){
+        column <- unlist(fb[[l]][i])
+        if(length(column) > 1){
+          nest <- data.frame(matrix(column, ncol=2, byrow=TRUE))
+          cName <- as.character(nest[,1])
+          nest <- data.frame(matrix(nest[,2], nrow=1))
+          colnames(nest) <- cName
+
+          temp_df <- cbind(temp_df, nest)
+        } else {
+          cName <- names(column)
+          column <- data.frame(column)
+          colnames(column) <- cName
+
+          temp_df <- cbind(temp_df,column)
+        }
+      }
+      df <- rbind.fill(df, temp_df)
+    }
+    df <- df[-1]
 
     for(i in 1:(ncol(df))){
       if(grepl("date", colnames(df)[i])){
