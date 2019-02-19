@@ -6,7 +6,7 @@
 #' @export
 #' @examples
 #' fetch_fb_data2(request_string, api_version="3.2")
-#' @import httr
+#' @import httr plyr
 fetch_fb_data2 <- function(request_string, api_version = "3.2"){
   if(!fb_check_existing_token()){
     stop("No authenticated token found!",call. = FALSE)
@@ -42,7 +42,7 @@ fetch_fb_data2 <- function(request_string, api_version = "3.2"){
           temp_df <- cbind(temp_df,column)
         }
       }
-      df <- rbind.fill(df, temp_df)
+      df <- plyr::rbind.fill(df, temp_df)
     }
     df <- df[-1]
 
