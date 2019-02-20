@@ -110,7 +110,7 @@ create_fb_token <- function(){
       stop("Authentication options didn't match existing session token and not interactive session
            so unable to manually reauthenticate", call. = FALSE)
     }
-    }
+  }
 
   endpoint <- oauth_endpoints("facebook")
 

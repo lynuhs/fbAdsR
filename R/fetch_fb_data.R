@@ -12,7 +12,7 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
     stop("No authenticated token found!",call. = FALSE)
   }
   startTime <- Sys.time()
-  if(show.info){
+  if(print.status){
     cat(crayon::red("Collecting data from Facebook...\n"))
   }
   data <- httr::GET(url = paste0("https://graph.facebook.com/v",api_version,"/", request_string),
@@ -24,7 +24,7 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
     stop("Failed to make request to Facebook! Make sure to check your parameters, choose a shorter time range or use less granularity!")
   }
   data <- rjson::fromJSON(rawToChar(data$content))
-  if(show.info){
+  if(print.status){
     cat(crayon::red("Walking through data...\n"))
   }
   if(!(is.null(data$data))){
@@ -69,7 +69,7 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
         colnames(df) <- gsub("date_start","date",colnames(df))
       }
     }
-    if(show.info){
+    if(print.status){
       sec <- as.numeric(difftime(Sys.time(), startTime, units = "secs"))
       if(sec > 60){
         cat(crayon::green("Operation finished successfully in ",
@@ -86,7 +86,7 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
 
     return(df)
   } else {
-    if(show.info){
+    if(print.status){
       cat(crayon::green("Operation finished successfully!\n"))
     }
     return(data)
