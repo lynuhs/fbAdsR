@@ -11,7 +11,72 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
   if(!fb_check_existing_token()){
     stop("No authenticated token found!",call. = FALSE)
   }
-  startTime <- Sys.time()
+
+  if(regexpr("'since'", request_string) > 0 & regexpr("'until'", request_string) > 0){
+    from <- substr(request_string, regexpr("'since'", request_string)+9, regexpr("'since'", request_string)+18)
+    to <- substr(request_string, regexpr("'until'", request_string)+9, regexpr("'until'", request_string)+18)
+    days <- as.numeric(difftime(to, from, units = "days"))+1
+    splitted_days <- 30
+
+    data <- NULL
+    if(days > splitted_days){
+
+      cat(crayon::red(paste0(
+        "The requested amount of dates are too many for one API call. The request will be slit into ",
+        ceiling(days/splitted_days),
+        " requests instead.\n")))
+
+      for(d in 1:(ceiling(days/splitted_days))){
+        cat(crayon::red(paste0("Request ", d, " of ", ceiling(days/splitted_days), " is running...")))
+        splitFrom <- as.Date(from) + ((d-1)*splitted_days)
+        splitTo <- as.Date(from) + ((d-1)*splitted_days)+(splitted_days-1)
+        if(splitTo > as.Date(to)){
+          splitTo <- as.Date(to)
+        }
+
+        split_request <- gsub(to, splitTo, gsub(from, splitFrom, request_string))
+
+        data <- plyr::rbind.fill(data, fetch_data(split_request, print.status = FALSE))
+        cat(crayon::green(paste0("completed!\n")))
+      }
+
+    } else {
+      data <- fetch_data(request_string, print.status = print.status)
+    }
+  } else {
+    data <- fetch_data(request_string, print.status = print.status)
+  }
+
+  return(data)
+}
+
+
+#' Structures relevance score in a correct way
+#'
+#' Takes a data frame of relevance score columns and changes them to one column with integer values
+#'
+#'
+#' @noRd
+relevance_score <- function(data){
+  data <- data[!(grepl("status",colnames(data)))]
+  for(i in 1:ncol(data)){
+    score <- gsub("\\.","",substr(colnames(data[i]), nchar(colnames(data[i]))-1, nchar(colnames(data[i]))))
+    data[,i] <- as.integer(gsub("OK", score, data[,i]))
+  }
+  data[is.na(data)] <- 0
+  data$relevance_score <- rowSums(data)
+  data[data==0] <- NA
+  data <- as.data.frame(data[,'relevance_score'])
+  colnames(data) <- "ad_relevance_score"
+  return(data)
+}
+
+
+#' Sub routine to collect facebook data.
+#'
+#' @import httr plyr
+#' @noRd
+fetch_data <- function(request_string, api_version = "3.2", print.status = FALSE){
   if(print.status){
     cat(crayon::red("Collecting data from Facebook...\n"))
   }
@@ -70,24 +135,14 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
         colnames(df) <- gsub("date_start","date",colnames(df))
       }
     }
-    if(print.status){
-      sec <- as.numeric(difftime(Sys.time(), startTime, units = "secs"))
-      if(sec > 60){
-        cat(crayon::green("Operation finished successfully in ",
-                          floor(as.numeric(difftime(Sys.time(), startTime, units = "secs")) / 60),
-                          " minutes and ",
-                          ceiling(as.numeric(difftime(Sys.time(), startTime, units = "secs")) %% 60),
-                          " seconds.\n"))
-      } else {
-        cat(crayon::green("Operation finished successfully in ",
-                          ceiling(as.numeric(difftime(Sys.time(), startTime, units = "secs")) %% 60),
-                          " seconds.\n"))
-      }
-    }
 
     if(any(grepl("relevance_score", colnames(df)))){
       rel <- relevance_score(df[grepl("relevance_score", colnames(df))])
       df <- cbind(df[!(grepl("relevance_score", colnames(df)))], rel)
+    }
+
+    if(print.status){
+      cat(crayon::green("Operation finished successfully!\n"))
     }
 
     return(df)
@@ -97,25 +152,4 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
     }
     return(data)
   }
-}
-
-
-#' Structures relevance score in a correct way
-#'
-#' Takes a data frame of relevance score columns and changes them to one column with integer values
-#'
-#'
-#' @noRd
-relevance_score <- function(data){
-  data <- data[!(grepl("status",colnames(data)))]
-  for(i in 1:ncol(data)){
-    score <- gsub("\\.","",substr(colnames(data[i]), nchar(colnames(data[i]))-1, nchar(colnames(data[i]))))
-    data[,i] <- as.integer(gsub("OK", score, data[,i]))
-  }
-  data[is.na(data)] <- 0
-  data$relevance_score <- rowSums(data)
-  data[data==0] <- NA
-  data <- as.data.frame(data[,'relevance_score'])
-  colnames(data) <- "ad_relevance_score"
-  return(data)
 }
