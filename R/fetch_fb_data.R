@@ -11,17 +11,20 @@ fetch_fb_data <- function(request_string, api_version = "3.2"){
   if(!fb_check_existing_token()){
     stop("No authenticated token found!",call. = FALSE)
   }
+  startTime <- Sys.time()
+  cat(crayon::red("Collecting data from Facebook...\n"))
   data <- httr::GET(url = paste0("https://graph.facebook.com/v",api_version,"/", request_string),
                     config(token = FacebookAuth$public_fields$token))
 
-  if(data$status_code != 200){
+  if (data$status_code == 500){
+    stop("[500] Internal server error. Try a shorter time period or less granularity!")
+  } else if(data$status_code != 200){
     stop("Failed to make request to Facebook! Make sure to check your parameters, choose a shorter time range or use less granularity!")
   }
   data <- rjson::fromJSON(rawToChar(data$content))
-
+  cat(crayon::red("Walking through data...\n"))
   if(!(is.null(data$data))){
-    data <- unlist(data$data)
-
+    data <- data$data
     df <- NULL
     for(l in 1:(length(data))){
       temp_df <- data.frame(temp = matrix(1))
@@ -63,8 +66,22 @@ fetch_fb_data <- function(request_string, api_version = "3.2"){
       }
     }
 
+    sec <- as.numeric(difftime(Sys.time(), startTime, units = "secs"))
+    if(sec > 60){
+      cat(crayon::green("Operation finished successfully in ",
+                        floor(as.numeric(difftime(Sys.time(), startTime, units = "secs")) / 60),
+                        " minutes and ",
+                        ceiling(as.numeric(difftime(Sys.time(), startTime, units = "secs")) %% 60),
+                        " seconds.\n"))
+    } else {
+      cat(crayon::green("Operation finished successfully in ",
+                        ceiling(as.numeric(difftime(Sys.time(), startTime, units = "secs")) %% 60),
+                        " seconds.\n"))
+    }
+
     return(df)
   } else {
+    cat(crayon::green("Operation finished successfully!\n"))
     return(data)
   }
 }
