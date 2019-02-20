@@ -16,7 +16,7 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
     from <- substr(request_string, regexpr("'since'", request_string)+9, regexpr("'since'", request_string)+18)
     to <- substr(request_string, regexpr("'until'", request_string)+9, regexpr("'until'", request_string)+18)
     days <- as.numeric(difftime(to, from, units = "days"))+1
-    splitted_days <- 30
+    splitted_days <- 20
 
     data <- NULL
     if(days > splitted_days){
