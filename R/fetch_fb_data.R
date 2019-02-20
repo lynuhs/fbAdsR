@@ -85,6 +85,11 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
       }
     }
 
+    if(any(grepl("relevance_score", colnames(df)))){
+      rel <- relevance_score(df[grepl("relevance_score", colnames(df))])
+      df <- cbind(df[!(grepl("relevance_score", colnames(df)))], rel)
+    }
+
     return(df)
   } else {
     if(print.status){
@@ -92,4 +97,25 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
     }
     return(data)
   }
+}
+
+
+#' Structures relevance score in a correct way
+#'
+#' Takes a data frame of relevance score columns and changes them to one column with integer values
+#'
+#'
+#' @noRd
+relevance_score <- function(data){
+  data <- data[!(grepl("status",colnames(data)))]
+  for(i in 1:ncol(data)){
+    score <- gsub("\\.","",substr(colnames(data[i]), nchar(colnames(data[i]))-1, nchar(colnames(data[i]))))
+    data[,i] <- as.integer(gsub("OK", score, data[,i]))
+  }
+  data[is.na(data)] <- 0
+  data$relevance_score <- rowSums(data)
+  data[data==0] <- NA
+  data <- as.data.frame(data[,'relevance_score'])
+  colnames(data) <- "ad_relevance_score"
+  return(data)
 }
