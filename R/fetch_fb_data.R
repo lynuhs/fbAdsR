@@ -36,7 +36,8 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
         column <- unlist(data[[l]][i])
         if(length(column) > 1){
           nest <- data.frame(matrix(column, ncol=2, byrow=TRUE))
-          cName <- as.character(nest[,1])
+          nestName <- unlist(strsplit(names(column)[1], "\\."))[1]
+          cName <- paste0(nestName,".",as.character(nest[,1]))
           nest <- data.frame(matrix(nest[,2], nrow=1))
           colnames(nest) <- cName
 
