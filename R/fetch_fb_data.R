@@ -23,10 +23,10 @@ fetch_fb_data <- function(request_string, api_version = "3.2"){
     data <- unlist(data$data)
 
     df <- NULL
-    for(l in 1:(length(fb))){
+    for(l in 1:(length(data))){
       temp_df <- data.frame(temp = matrix(1))
-      for(i in 1:(length(fb[[l]]))){
-        column <- unlist(fb[[l]][i])
+      for(i in 1:(length(data[[l]]))){
+        column <- unlist(data[[l]][i])
         if(length(column) > 1){
           nest <- data.frame(matrix(column, ncol=2, byrow=TRUE))
           cName <- as.character(nest[,1])
