@@ -40,7 +40,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdow
         "&level=", level,
         "&limit=99999"
       )
-      df <- rbind(df, cbind(account_id=gsub("act_","",account_id[i]), fetch_fb_data(request)))
+      df <- rbind(df, cbind(account_id=gsub("act_","",account_id[i]), fetch_fb_data(request, show.info = TRUE)))
     }
   } else {
     request <- paste0(
@@ -53,7 +53,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdow
       "&level=", level,
       "&limit=99999"
     )
-    df <- fetch_fb_data(request)
+    df <- fetch_fb_data(request, show.info = TRUE)
   }
 
   if(any(grepl("date", colnames(df)))){

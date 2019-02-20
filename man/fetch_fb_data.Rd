@@ -4,7 +4,8 @@
 \alias{fetch_fb_data}
 \title{Collect data from Facebook API}
 \usage{
-fetch_fb_data(request_string, api_version = "3.2")
+fetch_fb_data(request_string, api_version = "3.2",
+  print.status = FALSE)
 }
 \arguments{
 \item{request_string}{A string that contains the API call to GET from Facebook.}
