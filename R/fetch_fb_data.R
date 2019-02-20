@@ -37,7 +37,7 @@ fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FA
         split_request <- gsub(to, splitTo, gsub(from, splitFrom, request_string))
 
         data <- plyr::rbind.fill(data, fetch_data(split_request, print.status = FALSE))
-        cat(crayon::green(paste0("completed!\n")))
+        cat(crayon::red(paste0("completed!\n")))
       }
 
     } else {
