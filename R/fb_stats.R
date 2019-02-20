@@ -56,7 +56,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdow
     df <- fetch_fb_data(request, print.status = TRUE)
   }
 
-  if(any(grepl("date", colnames(df)))){
+  if(any(grepl("^date$", colnames(df)))){
     df <- cbind(date=df$date, df[,!(colnames(df) %in% "date")])
   } else if (any(grepl("date_start", colnames(df))) & any(grepl("date_stop", colnames(df)))){
     df <- cbind(date_start=df$date_start, date_stop=df$date_stop, df[!(names(df) %in% c("date_start","date_stop"))])
