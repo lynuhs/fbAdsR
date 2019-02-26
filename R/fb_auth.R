@@ -137,7 +137,8 @@ create_fb_token <- function(){
 
   facebook_token <- oauth2.0_token(endpoint = endpoint,
                                    app = app,
-                                   cache = cache)
+                                   cache = cache,
+                                   client_credentials = TRUE)
 
 
   stopifnot(is_legit_token(facebook_token))
