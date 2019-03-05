@@ -9,7 +9,11 @@
 #' @import httr plyr
 fetch_fb_data <- function(request_string, api_version = "3.2", print.status = FALSE){
   if(!fb_check_existing_token()){
-    stop("No authenticated token found!",call. = FALSE)
+    tryCatch({
+      fb_auth()
+    }, error = function(e){
+      stop("No authenticated token found!",call. = FALSE)
+    })
   }
 
   if(regexpr("'since'", request_string) > 0 & regexpr("'until'", request_string) > 0){
