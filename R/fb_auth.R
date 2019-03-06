@@ -105,7 +105,11 @@ fb_auth <- function(key = Sys.getenv("FB_CLIENT_ID"), secret = Sys.getenv("FB_CL
 create_fb_token <- function(){
   check_existing <- fb_check_existing_token()
   if(!check_existing){
-    cat(crayon::red("Auto-refresh of token not possible, manual re-authentication required\n"))
+    tryCatch({
+      fb_auth()
+    }, error = function(e){
+      cat(crayon::red("Auto-refresh of token not possible, manual re-authentication required\n"))
+    })
     if(!interactive()){
       stop("Authentication options didn't match existing session token and not interactive session
            so unable to manually reauthenticate", call. = FALSE)
