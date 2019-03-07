@@ -31,7 +31,7 @@ fb_auth <- function(key = Sys.getenv("FB_CLIENT_ID"), secret = Sys.getenv("FB_CL
   }
 
   options("fbAdsR.httr_oauth_cache" = ifelse(is.null(getOption("fbAdsR.httr_oauth_cache")),
-                                             ".httr-oauth",
+                                             ifelse(is.null(token), ".httr-oauth", token),
                                              getOption("fbAdsR.httr_oauth_cache")))
 
   options("fbAdsR.client_id" = checkEnvFile("FB_CLIENT_ID"))
@@ -74,7 +74,7 @@ fb_auth <- function(key = Sys.getenv("FB_CLIENT_ID"), secret = Sys.getenv("FB_CL
     ## just return it back
     facebook_token <- token
 
-  } else if(is.string(token)){ ## a filepath
+  } else if(assertthat::is.string(token)){ ## a filepath
 
     if(file.exists(token)){
       facebook_token <- read_cache_token(token_path = token)
@@ -105,11 +105,8 @@ fb_auth <- function(key = Sys.getenv("FB_CLIENT_ID"), secret = Sys.getenv("FB_CL
 create_fb_token <- function(){
   check_existing <- fb_check_existing_token()
   if(!check_existing){
-    tryCatch({
-      fb_auth()
-    }, error = function(e){
-      cat(crayon::red("Auto-refresh of token not possible, manual re-authentication required\n"))
-    })
+    cat(crayon::red("Auto-refresh of token not possible, manual re-authentication required\n"))
+
     if(!interactive()){
       stop("Authentication options didn't match existing session token and not interactive session
            so unable to manually reauthenticate", call. = FALSE)
