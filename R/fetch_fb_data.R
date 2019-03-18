@@ -104,7 +104,9 @@ fetch_data <- function(request_string, api_version = "3.2", print.status = FALSE
       for(i in 1:(length(data[[l]]))){
         column <- unlist(data[[l]][i])
         if(length(column) > 1){
-          if(any(grepl("pixel",unlist(data[[l]][i])))){
+          if(any(grepl("1d_",names(unlist(data[[l]][i]))))|
+             any(grepl("7d_",names(unlist(data[[l]][i]))))|
+             any(grepl("28d_",names(unlist(data[[l]][i]))))){
             main_name <- unlist(strsplit(names(column)[1], "\\."))[1]
             loops <- length(data[[l]][i][[1]])
             nested_df <- data.frame(temp = matrix(1))
