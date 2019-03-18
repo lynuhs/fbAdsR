@@ -104,13 +104,35 @@ fetch_data <- function(request_string, api_version = "3.2", print.status = FALSE
       for(i in 1:(length(data[[l]]))){
         column <- unlist(data[[l]][i])
         if(length(column) > 1){
-          nest <- data.frame(matrix(column, ncol=2, byrow=TRUE))
-          nestName <- unlist(strsplit(names(column)[1], "\\."))[1]
-          cName <- paste0(nestName,".",as.character(nest[,1]))
-          nest <- data.frame(matrix(nest[,2], nrow=1))
-          colnames(nest) <- cName
+          if(any(grepl("pixel",unlist(data[[l]][i])))){
+            main_name <- unlist(strsplit(names(column)[1], "\\."))[1]
+            loops <- length(data[[l]][i][[1]])
+            nested_df <- data.frame(temp = matrix(1))
+            nested_names <- NULL
+            for(m in 1:loops){
+              nested_columns_length <- length(unlist(data[[l]][i][[1]][m]))
+              nested_df <- cbind(nested_df, data.frame(unlist(data[[l]][i][[1]][m])['value'], row.names = 1))
+              nested_names <- c(nested_names, paste0(main_name,".",unlist(data[[l]][i][[1]][m])[1]))
+              if(nested_columns_length > 2){
+                for(k in 3:nested_columns_length){
+                  temp_nest_df <- data.frame(unlist(data[[l]][i][[1]][m])[k], row.names = 1)
+                  nested_names <- c(nested_names, paste0(main_name,".",unlist(data[[l]][i][[1]][m])[1], ".", names(unlist(data[[l]][i][[1]][m])[k])))
+                  nested_df <- cbind(nested_df, temp_nest_df)
+                }
+              }
+            }
+            nested_df <- nested_df[-1]
+            colnames(nested_df) <- nested_names
+            temp_df <- cbind(temp_df, nested_df)
+          } else {
+            nest <- data.frame(matrix(column, ncol=2, byrow=TRUE))
+            nestName <- unlist(strsplit(names(column)[1], "\\."))[1]
+            cName <- paste0(nestName,".",as.character(nest[,1]))
+            nest <- data.frame(matrix(nest[,2], nrow=1))
+            colnames(nest) <- cName
 
-          temp_df <- cbind(temp_df, nest)
+            temp_df <- cbind(temp_df, nest)
+          }
         } else {
           cName <- names(column)
           column <- data.frame(column)
