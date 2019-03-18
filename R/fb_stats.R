@@ -11,7 +11,7 @@
 #' @export
 #' @examples
 #' fb_stats(account_id, fromDate, toDate, dimensions, metrics, breakdowns = "", level="campaign")
-fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdowns = "", level="campaign"){
+fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdowns = "", level="campaign", custom = ""){
   if ("date" %in% dimensions){
     dimensions <- dimensions[which(dimensions!="date")]
     time <- "&time_increment=1"
@@ -24,7 +24,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdow
   metrics <- paste(metrics, collapse=",")
 
   fields <- paste(c(dimensions,metrics), collapse = ",")
-
+  custom <- ifelse(custom=="","",paste0("&",custom))
 
   if(length(account_id) > 1){
     df <- NULL
@@ -38,6 +38,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdow
         "&breakdowns=", breakdowns,
         "&fields=", fields,
         "&level=", level,
+        custom,
         "&limit=99999"
       )
       df <- rbind(df, cbind(account_id=gsub("act_","",account_id[i]), fetch_fb_data(request, print.status = TRUE)))
@@ -51,6 +52,7 @@ fb_stats <- function(account_id, fromDate, toDate, dimensions, metrics, breakdow
       "&breakdowns=", breakdowns,
       "&fields=", fields,
       "&level=", level,
+      custom,
       "&limit=99999"
     )
     df <- fetch_fb_data(request, print.status = TRUE)

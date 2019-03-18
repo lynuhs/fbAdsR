@@ -5,7 +5,7 @@
 \title{Import statistics from Facebook}
 \usage{
 fb_stats(account_id, fromDate, toDate, dimensions, metrics,
-  breakdowns = "", level = "campaign")
+  breakdowns = "", level = "campaign", custom = "")
 }
 \arguments{
 \item{account_id}{The account id for which you want to import data fram (needs to start with "act_").}
